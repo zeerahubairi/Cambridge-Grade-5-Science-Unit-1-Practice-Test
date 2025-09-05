@@ -5,96 +5,97 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kids Science Quiz</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f9f4; padding: 20px; margin: 0; }
-    h1 { color: #2c6e49; text-align: center; }
-    .question { margin-bottom: 15px; padding: 10px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    button { margin-top: 20px; padding: 12px 18px; border: none; border-radius: 6px; background: #2c6e49; color: #fff; cursor: pointer; display: block; margin-left: auto; margin-right: auto; font-size: 16px; }
+    body { 
+      font-family: Arial, sans-serif; 
+      background: #f4f9f4; 
+      padding: 10px; 
+      margin: 0; 
+    }
+    h1 { 
+      color: #2c6e49; 
+      text-align: center; 
+      font-size: 1.6em;
+      margin-bottom: 15px;
+    }
+    .question { 
+      margin-bottom: 18px; 
+      padding: 12px; 
+      background: #fff; 
+      border-radius: 10px; 
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
+    }
+    p { margin: 0 0 8px 0; font-size: 1em; }
+    label { display: block; padding: 6px; border-radius: 6px; }
+    input[type="radio"], input[type="text"] { margin-right: 8px; }
+    input[type="text"] { 
+      width: 100%; 
+      max-width: 100%; 
+      padding: 10px; 
+      margin-top: 6px; 
+      border-radius: 6px; 
+      border: 1px solid #ccc; 
+      font-size: 1em; 
+    }
+    button { 
+      margin-top: 20px; 
+      padding: 14px 20px; 
+      border: none; 
+      border-radius: 8px; 
+      background: #2c6e49; 
+      color: #fff; 
+      cursor: pointer; 
+      display: block; 
+      margin-left: auto; 
+      margin-right: auto; 
+      font-size: 1.1em; 
+      width: 100%;
+      max-width: 300px;
+    }
     button:hover { background: #387d56; }
-    .result { font-weight: bold; margin-top: 8px; }
+    .result { font-weight: bold; margin-top: 6px; font-size: 0.95em; }
     .correct { color: green; }
     .incorrect { color: red; }
-    #score { text-align: center; margin-top: 20px; font-size: 18px; }
-    input[type="text"] { width: 100%; max-width: 300px; padding: 8px; margin-top: 6px; border-radius: 4px; border: 1px solid #ccc; }
+    #score { 
+      text-align: center; 
+      margin-top: 25px; 
+      font-size: 1.2em; 
+      font-weight: bold; 
+    }
+    #progress {
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 1em;
+      font-weight: bold;
+      color: #2c6e49;
+    }
   </style>
 </head>
 <body>
   <h1>🌱 Kids Science Quiz – Plants and Flowers</h1>
+  <div id="progress">Progress: 0 / 12</div>
   <div id="quiz"></div>
-  <button onclick="checkAnswers()">Check Answers</button>
+  <button onclick="checkAnswers()">Check All Answers</button>
   <div id="score"></div>
 
   <script>
     const quizData = [
-      {
-        type: "mcq",
-        question: "Which part of the flower produces pollen?",
-        options: ["Ovary", "Anther", "Stigma", "Petals"],
-        answer: 1
-      },
-      {
-        type: "mcq",
-        question: "Which of these is both a pollinator and a producer of honey?",
-        options: ["Butterfly", "Bee", "Crow", "Earthworm"],
-        answer: 1
-      },
-      {
-        type: "mcq",
-        question: "Which part of the flower forms from the ovary and contains seeds?",
-        options: ["Petals", "Fruit", "Filament", "Sepals"],
-        answer: 1
-      },
-      {
-        type: "fill",
-        question: "The coloured outer parts of a flower are called _________.",
-        answer: "petals"
-      },
-      {
-        type: "fill",
-        question: "The female parts of a flower are called the _________.",
-        answer: "carpel"
-      },
-      {
-        type: "mcq",
-        question: "Which part of the flower is the stalk of the stamen that holds the anther?",
-        options: ["Filament", "Carpel", "Sepals", "Stigma"],
-        answer: 0
-      },
-      {
-        type: "fill",
-        question: "The tip of the carpel is called the _________.",
-        answer: "stigma"
-      },
-      {
-        type: "fill",
-        question: "The outer ring of small green leaves at the base of a flower is called _________.",
-        answer: "sepals"
-      },
-      {
-        type: "mcq",
-        question: "What is the job or purpose of something called?",
-        options: ["Function", "Reproduce", "Scent", "Pollen"],
-        answer: 0
-      },
-      {
-        type: "fill",
-        question: "The life process of forming seeds or spores that can grow into new plants is called _________.",
-        answer: "reproduce"
-      },
-      {
-        type: "mcq",
-        question: "Which powdery substance made in anthers helps in reproduction?",
-        options: ["Fruit", "Scent", "Pollen", "Sepals"],
-        answer: 2
-      },
-      {
-        type: "fill",
-        question: "Similar to seeds but always very small, used for reproduction in mosses and ferns are called _________.",
-        answer: "spores"
-      }
+      { type: "mcq", question: "Which part of the flower produces pollen?", options: ["Ovary", "Anther", "Stigma", "Petals"], answer: 1 },
+      { type: "mcq", question: "Which of these is both a pollinator and a producer of honey?", options: ["Butterfly", "Bee", "Crow", "Earthworm"], answer: 1 },
+      { type: "mcq", question: "Which part of the flower forms from the ovary and contains seeds?", options: ["Petals", "Fruit", "Filament", "Sepals"], answer: 1 },
+      { type: "fill", question: "The coloured outer parts of a flower are called _________.", answer: "petals" },
+      { type: "fill", question: "The female parts of a flower are called the _________.", answer: "carpel" },
+      { type: "mcq", question: "Which part of the flower is the stalk of the stamen that holds the anther?", options: ["Filament", "Carpel", "Sepals", "Stigma"], answer: 0 },
+      { type: "fill", question: "The tip of the carpel is called the _________.", answer: "stigma" },
+      { type: "fill", question: "The outer ring of small green leaves at the base of a flower is called _________.", answer: "sepals" },
+      { type: "mcq", question: "What is the job or purpose of something called?", options: ["Function", "Reproduce", "Scent", "Pollen"], answer: 0 },
+      { type: "fill", question: "The life process of forming seeds or spores that can grow into new plants is called _________.", answer: "reproduce" },
+      { type: "mcq", question: "Which powdery substance made in anthers helps in reproduction?", options: ["Fruit", "Scent", "Pollen", "Sepals"], answer: 2 },
+      { type: "fill", question: "Similar to seeds but always very small, used for reproduction in mosses and ferns are called _________.", answer: "spores" }
     ];
 
     function loadQuiz() {
       const quizContainer = document.getElementById("quiz");
+      const progress = document.getElementById("progress");
       quizData.forEach((q, index) => {
         const div = document.createElement("div");
         div.className = "question";
@@ -103,14 +104,29 @@
         let html = `<p><b>Q${index + 1}:</b> ${q.question}</p>`;
         if (q.type === "mcq") {
           q.options.forEach((opt, i) => {
-            html += `<label><input type='radio' name='q${index}' value='${i}'> ${opt}</label><br>`;
+            html += `<label><input type='radio' name='q${index}' value='${i}' onchange='updateProgress()'> ${opt}</label>`;
           });
         } else if (q.type === "fill") {
-          html += `<input type='text' id='fill${index}' placeholder='Your answer'>`;
+          html += `<input type='text' id='fill${index}' placeholder='Your answer' oninput='updateProgress()'>`;
         }
         div.innerHTML = html + `<div class='result' id='r${index}'></div>`;
         quizContainer.appendChild(div);
       });
+      progress.textContent = `Progress: 0 / ${quizData.length}`;
+    }
+
+    function updateProgress() {
+      let answered = 0;
+      quizData.forEach((q, index) => {
+        if (q.type === "mcq") {
+          const selected = document.querySelector(`input[name='q${index}']:checked`);
+          if (selected) answered++;
+        } else if (q.type === "fill") {
+          const inputEl = document.getElementById("fill" + index);
+          if (inputEl.value.trim() !== "") answered++;
+        }
+      });
+      document.getElementById("progress").textContent = `Progress: ${answered} / ${quizData.length}`;
     }
 
     function checkAnswers() {
@@ -130,30 +146,32 @@
         } else if (q.type === "fill") {
           const inputEl = document.getElementById("fill" + index);
           const userAnswer = inputEl.value.trim().toLowerCase();
-          const key = "attempts_q" + index;
-
-          let attempts = parseInt(localStorage.getItem(key) || "0");
 
           if (userAnswer === q.answer.toLowerCase()) {
             result.textContent = "✔ Great job! You got it right!";
             result.className = "result correct";
             score++;
-            localStorage.removeItem(key);
+          } else if (userAnswer) {
+            const firstLetter = q.answer.charAt(0).toUpperCase();
+            result.textContent = `😅 Uh-oh, looks like you're having a little trouble. Hint: starts with '${firstLetter}' and has ${q.answer.length} letters.`;
+            result.className = "result incorrect";
           } else {
-            attempts++;
-            localStorage.setItem(key, attempts);
-
-            if (attempts === 1) {
-              const firstLetter = q.answer.charAt(0);
-              result.textContent = `Uh-oh, looks like you're having a little trouble. Hint: the answer starts with '${firstLetter.toUpperCase()}' and has ${q.answer.length} letters.`;
-            } else {
-              result.textContent = `The correct answer is: ${q.answer}`;
-            }
+            result.textContent = "✘ You left this blank.";
             result.className = "result incorrect";
           }
         }
       });
-      document.getElementById("score").innerHTML = `<h2>Your Score: ${score}/${quizData.length}</h2>`;
+
+      let message = "";
+      if (score === quizData.length) {
+        message = "🎉 Perfect score! You’re a plant genius!";
+      } else if (score >= quizData.length * 0.7) {
+        message = "🌟 Great work! You really know your plants!";
+      } else {
+        message = "👍 Keep practicing, you’re getting better every time!";
+      }
+
+      document.getElementById("score").innerHTML = `<h2>Your Score: ${score}/${quizData.length}</h2><p>${message}</p>`;
     }
 
     loadQuiz();
