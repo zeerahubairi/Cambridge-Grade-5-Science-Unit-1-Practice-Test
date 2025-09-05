@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kids Science Quiz – Flowers & Plants</title>
+  <style>
+    :root{
+      --bg:#f9fbff;--card:#ffffff;--ink:#1f2937;--muted:#6b7280;--accent:#2563eb;--accent2:#10b981;--wrong:#ef4444;--right:#16a34a;--shadow:0 10px 25px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--ink)}
+    header{position:sticky;top:0;background:linear-gradient(180deg,#eef4ff,rgba(238,244,255,.6));backdrop-filter:saturate(150%) blur(6px);padding:18px 20px;box-shadow:0 1px 0 rgba(0,0,0,.06)}
+    .wrap{max-width:920px;margin:auto;padding:20px}
+    .card{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:18px;margin:14px 0}
+    h1{margin:6px 0 0;font-size:clamp(22px,3.4vw,34px)}
+    .muted{color:var(--muted)}
+    .row{display:flex;gap:14px;flex-wrap:wrap}
+    button{border:0;border-radius:14px;padding:12px 16px;font-weight:700;cursor:pointer}
+    .btn{background:var(--accent);color:#fff}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+    .btn-ghost{background:#eef2ff}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:#eef2ff;color:#1d4ed8;font-weight:700}
+    .q{border:2px solid #eef2ff;border-radius:16px;padding:16px}
+    .q h3{margin:0 0 8px;font-size:18px}
+    .options{display:grid;gap:10px}
+    label.opt{display:flex;gap:10px;align-items:flex-start;padding:10px;border:2px solid #e5e7eb;border-radius:12px;cursor:pointer}
+    label.opt input{margin-top:4px}
+    label.opt.correct{border-color:var(--right);background:#ecfdf5}
+    label.opt.incorrect{border-color:var(--wrong);background:#fef2f2}
+    .badge{font-size:12px;padding:2px 8px;border-radius:999px}
+    .good{background:#dcfce7;color:#166534}
+    .bad{background:#fee2e2;color:#991b1b}
+    .info{background:#e0e7ff;color:#3730a3}
+    .footer{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px}
+    input[type=text]{width:100%;padding:12px;border:2px solid #e5e7eb;border-radius:12px}
+    select{padding:10px;border-radius:12px;border:2px solid #e5e7eb}
+    .progress{height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+    .bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0}
+    .scoreboard{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+    .small{font-size:13px}
+    .center{text-align:center}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="row" style="align-items:center;justify-content:space-between">
+        <div>
+          <h1>Kids Science Quiz</h1>
+          <div class="muted small">Flowers & Plants – auto‑grading • progress saved</div>
+        </div>
+        <div class="pill" id="status-pill">Score: <span id="score-mini">0</span>/<span id="total-mini">0</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <div class="scoreboard">
+        <div class="card">
+          <div class="muted small">Progress</div>
+          <div class="progress" aria-label="overall progress"><div class="bar" id="progress-bar"></div></div>
+        </div>
+        <div class="card center">
+          <div class="muted small">Your Score</div>
+          <div style="font-size:32px;font-weight:800" id="score-big">0%</div>
+        </div>
+        <div class="card center">
+          <div class="muted small">Answered</div>
+          <div style="font-size:24px;font-weight:800"><span id="answered">0</span>/<span id="total">0</span></div>
+        </div>
+      </div>
+      <div class="row" style="justify-content:flex-end">
+        <button class="btn-ghost" id="btn-reset">Reset</button>
+        <button class="btn" id="btn-submit">Grade All</button>
+      </div>
+    </section>
+
+    <section id="quiz"></section>
+
+    <section class="card center">
+      <h2>Great job!</h2>
+      <p class="muted">When you finish, click <b>Grade All</b>. You can reset anytime. Questions are auto‑saved.</p>
+      <button class="btn" id="btn-certificate" disabled>Download Certificate</button>
+    </section>
+  </main>
+
+  <script>
+    // ===== Editable Quiz Data (you can change these or add more) =====
+    const QUIZ = [
+      // MCQs
+      {type:'mcq', prompt:'Which part of the flower forms from the ovary and contains seeds?', options:['Petals','Fruit','Filament','Sepals'], answer:'Fruit'},
+      {type:'mcq', prompt:'What is the job or purpose of something called?', options:['Function','Reproduce','Scent','Pollen'], answer:'Function'},
+      {type:'mcq', prompt:'Which part of the flower contains eggs?', options:['Anther','Ovary','Stamen','Filament'], answer:'Ovary'},
+      {type:'mcq', prompt:'The yellow or brown powder made in anthers is called:', options:['Spores','Pollen','Stigma','Sepals'], answer:'Pollen'},
+      {type:'mcq', prompt:'Which part is the stalk of the stamen that holds the anther?', options:['Filament','Petals','Carpel','Stigma'], answer:'Filament'},
+
+      // Fill in the blank (short text, case-insensitive)
+      {type:'fitb', prompt:'The ________ are coloured outer parts of a flower.', answer:'petals'},
+      {type:'fitb', prompt:'The outer ring of small green leaves on the base of a flower is called ________.', answer:'sepals'},
+      {type:'fitb', prompt:'The female parts of a flower are called the ________.', answer:'carpel'},
+      {type:'fitb', prompt:'The process of having young or forming seeds is called ________.', answer:'reproduce'},
+      {type:'fitb', prompt:'The tip of the carpel is called the ________.', answer:'stigma'},
+
+      // True/False
+      {type:'tf', prompt:'The ovary of a flower contains pollen.', answer:false},
+      {type:'tf', prompt:'Spores are very small and used for reproduction in mosses and ferns.', answer:true},
+      {type:'tf', prompt:'The fruit develops from the ovary of a flower.', answer:true},
+      {type:'tf', prompt:'The filament holds the anther in place.', answer:true},
+      {type:'tf', prompt:'The stamen is the female part of the flower.', answer:false},
+
+      // Matching (drag select via dropdown)
+      {type:'match', prompt:'Match each term with its definition.', pairs:{
+        'Life cycle':'Different stages in a flowering plant\'s life',
+        'Spores':'Similar to seeds but very small; used in mosses and ferns',
+        'Anther':'Tip of the stamen that makes pollen',
+        'Scent':'Smell that flower petals give out',
+        'Stamen':'Male part of a flower'
+      }},
+    ];
+
+    // ===== Render =====
+    const quizEl = document.getElementById('quiz');
+    const totalEl = document.getElementById('total');
+    const totalMiniEl = document.getElementById('total-mini');
+
+    function makeId(){return Math.random().toString(36).slice(2,9)}
+
+    function render(){
+      quizEl.innerHTML='';
+      let index=1;
+      QUIZ.forEach((q,i)=>{
+        const wrap=document.createElement('div');
+        wrap.className='card q';
+        wrap.dataset.index=i;
+        const title=document.createElement('h3');
+        title.textContent=`Q${index++}. ${q.prompt}`;
+        wrap.appendChild(title);
+
+        if(q.type==='mcq'){
+          const opts=document.createElement('div');
+          opts.className='options';
+          q.options.forEach(opt=>{
+            const id=makeId();
+            const label=document.createElement('label');
+            label.className='opt';
+            label.setAttribute('for',id);
+            const input=document.createElement('input');
+            input.type='radio';
+            input.name='q'+i;
+            input.id=id; input.value=opt;
+            input.onchange=saveProgress;
+            label.appendChild(input);
+            const span=document.createElement('span');
+            span.textContent=opt;
+            label.appendChild(span);
+            opts.appendChild(label);
+          });
+          wrap.appendChild(opts);
+        }
+        if(q.type==='fitb'){
+          const input=document.createElement('input');
+          input.type='text';
+          input.placeholder='Type your answer';
+          input.oninput=saveProgress;
+          wrap.appendChild(input);
+        }
+        if(q.type==='tf'){
+          const opts=document.createElement('div');
+          opts.className='options';
+          ['True','False'].forEach(opt=>{
+            const id=makeId();
+            const label=document.createElement('label');
+            label.className='opt';
+            label.setAttribute('for',id);
+            const input=document.createElement('input');
+            input.type='radio';
+            input.name='q'+i;
+            input.id=id; input.value=(opt==='True');
+            input.onchange=saveProgress;
+            label.appendChild(input);
+            const span=document.createElement('span');
+            span.textContent=opt;
+            label.appendChild(span);
+            opts.appendChild(label);
+          });
+          wrap.appendChild(opts);
+        }
+        if(q.type==='match'){
+          const box=document.createElement('div');
+          box.className='options';
+          const defs=Object.values(q.pairs);
+          const terms=Object.keys(q.pairs);
+          terms.forEach((term,ti)=>{
+            const row=document.createElement('div');
+            row.className='row';
+            const termEl=document.createElement('div');
+            termEl.style.flex='2';
+            termEl.textContent=term;
+            const select=document.createElement('select');
+            select.style.flex='4';
+            select.dataset.term=term;
+            select.onchange=saveProgress;
+            const blank=document.createElement('option');blank.value='';blank.textContent='Select definition…';
+            select.appendChild(blank);
+            defs.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;select.appendChild(o)});
+            row.appendChild(termEl);row.appendChild(select);
+            box.appendChild(row);
+          });
+          wrap.appendChild(box);
+        }
+        const foot=document.createElement('div');
+        foot.className='footer';
+        const fb=document.createElement('div');
+        fb.className='muted small';
+        fb.id='fb-'+i;
+        foot.appendChild(fb);
+        const btn=document.createElement('button');
+        btn.textContent='Check';
+        btn.className='btn-ghost';
+        btn.onclick=()=>gradeQuestion(i);
+        foot.appendChild(btn);
+        wrap.appendChild(foot);
+
+        quizEl.appendChild(wrap);
+      });
+      totalEl.textContent=QUIZ.length;
+      totalMiniEl.textContent=QUIZ.length;
+      restoreProgress();
+      updateStats();
+    }
+
+    // ===== Persistence =====
+    const KEY='kids-quiz-progress-v1';
+    function saveProgress(){
+      const data=[...document.querySelectorAll('.q')].map(qEl=>{
+        const i=+qEl.dataset.index; const q=QUIZ[i];
+        if(q.type==='mcq'||q.type==='tf'){
+          const v=(qEl.querySelector('input[type=radio]:checked')||{}).value; return v??'';
+        }
+        if(q.type==='fitb'){
+          return (qEl.querySelector('input[type=text]').value||'');
+        }
+        if(q.type==='match'){
+          const arr=[...qEl.querySelectorAll('select')].map(s=>({t:s.dataset.term,v:s.value}));
+          return arr;
+        }
+      });
+      localStorage.setItem(KEY,JSON.stringify(data));
+      updateStats();
+    }
+    function restoreProgress(){
+      const raw=localStorage.getItem(KEY); if(!raw) return;
+      let data; try{data=JSON.parse(raw)}catch{ return }
+      ;[...document.querySelectorAll('.q')].forEach(qEl=>{
+        const i=+qEl.dataset.index; const q=QUIZ[i]; const val=data[i];
+        if(val==null) return;
+        if(q.type==='mcq'||q.type==='tf'){
+          const input=[...qEl.querySelectorAll('input[type=radio]')].find(r=>String(r.value)===String(val));
+          if(input) input.checked=true;
+        }
+        if(q.type==='fitb'){
+          qEl.querySelector('input[type=text]').value=val;
+        }
+        if(q.type==='match'&&Array.isArray(val)){
+          val.forEach(({t,v})=>{const sel=qEl.querySelector(`select[data-term="${CSS.escape(t)}"]`); if(sel) sel.value=v});
+        }
+      });
+    }
+
+    // ===== Grading =====
+    function clean(s){return String(s||'').trim().toLowerCase()}
+
+    function gradeQuestion(i){
+      const q=QUIZ[i];
+      const qEl=document.querySelector(`.q[data-index="${i}"]`);
+      let correct=false; let answered=false;
+      if(q.type==='mcq'){
+        const picked=qEl.querySelector('input[type=radio]:checked');
+        answered=!!picked; if(!picked) return feedback('Pick an option to check.');
+        correct=clean(picked.value)===clean(q.answer);
+        qEl.querySelectorAll('label.opt').forEach(l=>{
+          l.classList.remove('correct','incorrect');
+          if(clean(l.textContent)===clean(q.answer)) l.classList.add('correct');
+          if(picked && l.contains(picked) && !correct) l.classList.add('incorrect');
+        });
+      }
+      if(q.type==='fitb'){
+        const input=qEl.querySelector('input[type=text]');
+        const val=clean(input.value); answered=val.length>0;
+        if(!answered) return feedback('Type an answer to check.');
+        correct=val===clean(q.answer);
+        input.style.borderColor=correct?'var(--right)':'var(--wrong)';
+      }
+      if(q.type==='tf'){
+        const picked=qEl.querySelector('input[type=radio]:checked');
+        answered=!!picked; if(!picked) return feedback('Choose True or False.');
+        correct=String(picked.value)===String(q.answer);
+        qEl.querySelectorAll('label.opt').forEach(l=>{
+          l.classList.remove('correct','incorrect');
+          const isTrue = l.textContent==='True';
+          if(String(isTrue)===String(q.answer)) l.classList.add('correct');
+          if(picked && l.contains(picked) && String(isTrue)!==String(q.answer)) l.classList.add('incorrect');
+        });
+      }
+      if(q.type==='match'){
+        const sels=[...qEl.querySelectorAll('select')];
+        answered=sels.every(s=>s.value);
+        if(!answered) return feedback('Match all items to check.');
+        correct=sels.every(s=>clean(s.value)===clean(q.pairs[s.dataset.term]));
+        sels.forEach(s=>{s.style.borderColor=(clean(s.value)===clean(q.pairs[s.dataset.term]))?'var(--right)':'var(--wrong)'});
+      }
+      feedback(correct?"✅ Correct!":"❌ Try again.", correct);
+      saveProgress();
+
+      function feedback(msg, ok){
+        const fb=document.getElementById('fb-'+i);
+        fb.textContent=msg; fb.className=`small badge ${ok?'good':'bad'}`;
+        updateStats();
+      }
+    }
+
+    function gradeAll(){
+      let correct=0, answered=0;
+      QUIZ.forEach((_,i)=>{
+        const qEl=document.querySelector(`.q[data-index="${i}"]`);
+        // simulate grading without changing UI too much
+        const res=evaluate(i);
+        if(res.answered) answered++;
+        if(res.correct) correct++;
+      });
+      const pct=Math.round((correct/QUIZ.length)*100);
+      document.getElementById('score-big').textContent=pct+"%";
+      document.getElementById('score-mini').textContent=correct;
+      document.getElementById('total-mini').textContent=QUIZ.length;
+      document.getElementById('answered').textContent=answered;
+      document.getElementById('btn-certificate').disabled = pct<60; // unlock at 60%
+      updateBar(answered/QUIZ.length);
+    }
+
+    function evaluate(i){
+      const q=QUIZ[i];
+      const qEl=document.querySelector(`.q[data-index="${i}"]`);
+      let correct=false; let answered=false;
+      if(q.type==='mcq'){
+        const picked=qEl.querySelector('input[type=radio]:checked');
+        answered=!!picked; if(picked) correct=clean(picked.value)===clean(q.answer);
+      }
+      if(q.type==='fitb'){
+        const val=clean(qEl.querySelector('input[type=text]').value);
+        answered=val.length>0; correct=val===clean(q.answer);
+      }
+      if(q.type==='tf'){
+        const picked=qEl.querySelector('input[type=radio]:checked');
+        answered=!!picked; if(picked) correct=String(picked.value)===String(q.answer);
+      }
+      if(q.type==='match'){
+        const sels=[...qEl.querySelectorAll('select')];
+        answered=sels.every(s=>s.value); correct=answered && sels.every(s=>clean(s.value)===clean(q.pairs[s.dataset.term]));
+      }
+      return {correct, answered};
+    }
+
+    function updateStats(){
+      let answered=0, correct=0;
+      QUIZ.forEach((_,i)=>{
+        const r=evaluate(i); if(r.answered) answered++; if(r.correct) correct++;
+      });
+      document.getElementById('answered').textContent=answered;
+      document.getElementById('total').textContent=QUIZ.length;
+      const pct=QUIZ.length?Math.round((correct/QUIZ.length)*100):0;
+      document.getElementById('score-big').textContent=pct+"%";
+      document.getElementById('score-mini').textContent=correct;
+      updateBar(answered/QUIZ.length);
+    }
+    function updateBar(frac){document.getElementById('progress-bar').style.width=(100*frac)+'%'}
+
+    // Certificate download (simple image-based)
+    document.getElementById('btn-certificate').addEventListener('click',()=>{
+      const name = prompt('Type your name for the certificate:','Super Scientist');
+      if(!name) return;
+      const canvas=document.createElement('canvas');
+      canvas.width=1200; canvas.height=800; const ctx=canvas.getContext('2d');
+      ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,1200,800);
+      ctx.fillStyle='#111827'; ctx.font='48px Arial';
+      ctx.fillText('Certificate of Achievement',300,150);
+      ctx.font='36px Arial'; ctx.fillText('Awarded to',520,260);
+      ctx.font='64px Arial'; ctx.fillStyle='#2563eb'; ctx.fillText(name, 420, 360);
+      ctx.fillStyle='#111827'; ctx.font='28px Arial'; ctx.fillText('For great work on the Flowers & Plants Quiz!', 280, 430);
+      const date=new Date().toLocaleDateString();
+      ctx.font='24px Arial'; ctx.fillText('Date: '+date, 520, 520);
+      const link=document.createElement('a'); link.download='certificate.png'; link.href=canvas.toDataURL(); link.click();
+    });
+
+    document.getElementById('btn-submit').addEventListener('click',gradeAll);
+    document.getElementById('btn-reset').addEventListener('click',()=>{localStorage.removeItem(KEY); render()});
+
+    // init
+    render();
+  </script>
+</body>
+</html>
