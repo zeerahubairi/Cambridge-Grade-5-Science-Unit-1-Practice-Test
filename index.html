@@ -25,7 +25,6 @@
 
   <script>
     const quizData = [
-      // --- Earlier Pollination MCQs ---
       {
         type: "mcq",
         question: "Which part of the flower produces pollen?",
@@ -38,7 +37,6 @@
         options: ["Butterfly", "Bee", "Crow", "Earthworm"],
         answer: 1
       },
-      // --- Knowledge Check from Earlier Definitions ---
       {
         type: "mcq",
         question: "Which part of the flower forms from the ovary and contains seeds?",
@@ -126,7 +124,7 @@
             result.className = "result correct";
             score++;
           } else {
-            result.textContent = "✘ Incorrect.";
+            result.textContent = "✘ Oops! That’s not right.";
             result.className = "result incorrect";
           }
         } else if (q.type === "fill") {
@@ -137,7 +135,7 @@
           let attempts = parseInt(localStorage.getItem(key) || "0");
 
           if (userAnswer === q.answer.toLowerCase()) {
-            result.textContent = "✔ Correct!";
+            result.textContent = "✔ Great job! You got it right!";
             result.className = "result correct";
             score++;
             localStorage.removeItem(key);
@@ -147,9 +145,9 @@
 
             if (attempts === 1) {
               const firstLetter = q.answer.charAt(0);
-              result.textContent = `✘ Incorrect. Hint: starts with '${firstLetter}' and has ${q.answer.length} letters.`;
+              result.textContent = `Uh-oh, looks like you're having a little trouble. Hint: the answer starts with '${firstLetter.toUpperCase()}' and has ${q.answer.length} letters.`;
             } else {
-              result.textContent = `✘ Incorrect. The correct answer is: ${q.answer}`;
+              result.textContent = `The correct answer is: ${q.answer}`;
             }
             result.className = "result incorrect";
           }
